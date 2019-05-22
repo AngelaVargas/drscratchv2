@@ -19,6 +19,8 @@ def subject_pass(lang):
         subject = "Dr.Scratch: Esqueceu sua senha?"
     elif lang == "el":
         subject = "Dr.Scratch: Ξεχάσατε τον κωδικό σας;"
+    elif lang == "eu":
+        subject = "Dr.Scratch: Did you forget your password?"
     return subject
 
 
@@ -39,6 +41,8 @@ def subject_welcome_organization(lang):
         subject = "Bem-vindo ao Dr.Scratch para organizações"
     elif lang == "el":
         subject = "Καλώς ήρθατε στο Dr.Scratch για τους οργανισμούς"
+    elif lang == "eu":
+        subject = "Welcome to Dr.Scratch for organizations"
     return subject
 
 def subject_welcome_coder(lang):
@@ -58,4 +62,6 @@ def subject_welcome_coder(lang):
         subject = "Bem-vindo ao Dr.Scratch!"
     elif lang == "el":
         subject = "Καλώς ήρθατε στο Dr.Scratch!"
+    elif lang == "en":
+        subject = "Welcome to Dr.Scratch!"
     return subject

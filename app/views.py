@@ -36,6 +36,7 @@ from django.contrib.auth.decorators import login_required
 from email.MIMEText import MIMEText
 from django.utils.encoding import smart_str
 from django.utils.translation import activate
+from zipfile import ZipFile
 import smtplib
 import email.utils
 import os
@@ -68,11 +69,16 @@ def main(request):
         username = request.user.username
         #Find which is authenticated (organization or coder or none)
         page = segmentation(request)
-        flagUser = 1
-        return render_to_response('main/main.html',
-                                    {'username':username,
-                                     'page':page,
-                                     'flagUser': flagUser})
+        if page == 'coder':
+            user = Coder.objects.get(username=username)
+        elif page == 'organization':
+            user = Organization.objects.get(username=username)
+        img = user.img
+        dic={'username':username,
+        "img":str(img)}
+        return render_to_response(page + "/main.html",
+                dic,
+                context_instance = RC(request))
     else:
         username = None
         #Show main page of Dr. Scratch: www.drscratch.org/
@@ -413,6 +419,8 @@ def generator_dic(request, idProject):
                                                       username, 
                                                       method)
 
+
+
         except:
             #When your project doesn't exist
             d = {'Error': 'no_exists'}
@@ -440,15 +448,33 @@ def generator_dic(request, idProject):
 
         return d
 
+def new_getSb2(file_name, dir_zips,fileName):
+    if zipfile.is_zipfile(file_name):
+        os.rename(dir_zips + "project.json",dir_zips + str(fileName.id) + ".sb2")
+    else:
+        current = os.getcwd()
+        os.chdir(dir_zips)
+        with ZipFile(str(fileName.id) + ".sb2", 'w') as myzip:
+            myzip.write("project.json")
+        os.chdir(current)
+        try:
+            os.remove(dir_zips + "project.json")
+        except:
+            print "No existe"
 
+    file_name = dir_zips + str(fileName.id) + ".sb2"
+    return file_name
 
 def send_request_getSb2(idProject, username, method):
     """First request to getSb2"""
 
 
-    #Check the length of idProject, it must have 8 digits.
-
-    getRequestSb2 = "http://drscratch.cloudapp.net:8080/" + idProject
+    try:
+        os.remove(dir_zips + "project.json")
+    except:
+        print "No existe"
+    #getRequestSb2 = "http://drscratch.cloudapp.net:8080/" + idProject
+    getRequestSb2 = "http://projects.scratch.mit.edu/internalapi/project/" + idProject + "/get/"
     fileURL = idProject + ".sb2"
     # Create DB of files
     now = datetime.now()
@@ -478,24 +504,35 @@ def send_request_getSb2(idProject, username, method):
                          userInteractivity = 0, dataRepresentation = 0,
                          spriteNaming = 0 ,initialization = 0,
                          deadCode = 0, duplicateScript = 0)
+    
     fileName.save()
     dir_zips = os.path.dirname(os.path.dirname(__file__)) + "/uploads/"
-    fileSaved = dir_zips + str(fileName.id) + ".sb2"
+    #fileSaved = dir_zips + str(fileName.id) + ".sb2"
+    fileSaved = dir_zips + "project.json"
+
     pathLog = os.path.dirname(os.path.dirname(__file__)) + "/log/"
     logFile = open (pathLog + "logFile.txt", "a")
     logFile.write("FileName: " + str(fileName.filename) + "\t\t\t" + "ID: " + \
         str(fileName.id) + "\t\t\t" + "Method: " + str(fileName.method) + \
         "\t\t\t" + "Time: " + str(fileName.time) + "\n")
+    
     # Save file in server
     counter = 0
 
-    
     file_name = handler_upload(fileSaved, counter)
     outputFile = open(file_name, 'wb')
+    try:
+        sb2File = urllib2.urlopen(getRequestSb2)
+        outputFile.write(sb2File.read())
+        outputFile.close()
+    except:
+        outputFile.write("ERROR downloading")
+        outputFile.close()
+    
 
-    sb2File = urllib2.urlopen(getRequestSb2)
-    outputFile.write(sb2File.read())
-    outputFile.close()
+    #New getSb2
+    file_name = new_getSb2(file_name, dir_zips,fileName)
+    
     return (file_name, fileName)
 
 #____________________________HANDLER UPLOAD FILE______________________________#
@@ -689,9 +726,10 @@ def proc_sprite_naming(lines, filename):
 
 def proc_dead_code(lines, filename):
     """Number of dead code with characters and blocks"""
-
+    
 
     dic = {}
+    #return dic # para que no de error de momento
     lLines = lines.split("\n")[1:]
     lcharacter = []
     lblocks = []
@@ -881,6 +919,32 @@ def translate(request,d, filename):
         filename.save()
         return d_translate_el
 
+    elif request.LANGUAGE_CODE == "eu":           
+        d_translate_eu = {}
+        d_translate_eu['Abstrakzioa'] = d['Abstraction']
+        d_translate_eu['Paralelismoa'] = d['Parallelization']
+        d_translate_eu['Logika'] = d['Logic']
+        d_translate_eu['Sinkronizatzea'] = d['Synchronization']
+        d_translate_eu['Kontrol fluxua'] = d['FlowControl']
+        d_translate_eu['Erabiltzailearen elkarreragiletasuna'] = d['UserInteractivity']
+        d_translate_eu['Datu adierazlea'] = d['DataRepresentation']
+        filename.language = "eu"
+        filename.save()
+        return d_translate_eu
+
+    elif request.LANGUAGE_CODE == "it":           
+        d_translate_it = {}
+        d_translate_it['Astrazione'] = d['Abstraction']
+        d_translate_it['Parallelismo'] = d['Parallelization']
+        d_translate_it['Logica'] = d['Logic']
+        d_translate_it['Sincronizzazione'] = d['Synchronization']
+        d_translate_it['Controllo di flusso'] = d['FlowControl']
+        d_translate_it['Interattività utente'] = d['UserInteractivity']
+        d_translate_it['Rappresentazione dei dati'] = d['DataRepresentation']
+        filename.language = "it"
+        filename.save()
+        return d_translate_it
+
     else:
         d_translate_en = {}
         d_translate_en['Abstraction'] = d['Abstraction']
@@ -892,6 +956,7 @@ def translate(request,d, filename):
         d_translate_en['Data representation'] = d['DataRepresentation']
         filename.language = "any"
         filename.save()
+        return d_translate_any
 
 ###############################################################################
 
@@ -968,6 +1033,26 @@ def learn(request,page):
            u'Αλληλεπίδραση':'User',
            u'Έλεγχος':'Flow',
            u'Αφαίρεση':'Abstraction'}
+
+    elif request.LANGUAGE_CODE == "eu":
+        page = unicodedata.normalize('NFKD',page).encode('ascii','ignore')
+        dic = {u'Logika':'Logic',
+           u'Paralelismoa':'Parallelism',
+           u'Datu':'Data',
+           u'Sinkronizatzea':'Synchronization',
+           u'Erabiltzailearen':'User',
+           u'Kontrol':'Flow',
+           u'Abstrakzioa':'Abstraction'}
+
+    elif request.LANGUAGE_CODE == "it":
+        page = unicodedata.normalize('NFKD',page).encode('ascii','ignore')
+        dic = {u'Logica':'Logic',
+           u'Parallelismo':'Parallelism',
+           u'Rappresentazione':'Data',
+           u'Sincronizzazione':'Synchronization',
+           u'Interattivita':'User',
+           u'Controllo':'Flow',
+           u'Astrazione':'Abstraction'}
 
     else:
         dic = {u'Logica':'Logic',
@@ -1453,7 +1538,6 @@ def downloads(request,username, filename=""):
     elif flagCoder:
         csv = CSVs.objects.all().filter(coder=username)
         page = 'coder'
-
     #LIFO to show the files.CSV
 
     csv_len = len(csv)
@@ -1525,6 +1609,13 @@ def analyze_CSV(request):
                 row = len(line.split(","))
                 type_csv = ""
                 username = request.user.username
+
+                #Check doesn't exist any old project.json
+                try:
+                    os.remove(dir_zips + "project.json")
+                except:
+                    print "No existe"
+                
                 if row == 2:
                     type_csv = "2_row"
                     code = line.split(",")[0]
@@ -1543,11 +1634,15 @@ def analyze_CSV(request):
 
                         (pathProject, file) = send_request_getSb2(idProject, 
                                                                     username,
-                                                                     method)
-
+                                                                    method)
                         d = analyze_project(request, pathProject, file)
                     except:
                         d = ["Error analyzing project", url]
+
+                    try:
+                        os.remove(dir_zips + "project.json")
+                    except:
+                        print "No existe"
 
                     dic = {}
                     dic[line] = d
@@ -1566,11 +1661,17 @@ def analyze_CSV(request):
                             idProject = url.split('/')[-2]
                     try:
                         (pathProject, file) = send_request_getSb2(idProject, 
-                                                                    username, 
-                                                                    method)
+                                                                    username,
+                                                                     method)
                         d = analyze_project(request, pathProject, file)
                     except:
                         d = ["Error analyzing project", url]
+
+                    try:
+                        os.remove(dir_zips + "project.json")
+                    except:
+                        print "No existe"
+
 
                     dic = {}
                     dic[url] = d
@@ -1639,6 +1740,7 @@ def generator_CSV(request, dictionary, filename, type_csv):
                         dic["flow_control"], dic["user_inter"], dic["data_rep"],
                         dic["dup_scripts"],dic["sprite_naming"],
                         dic["dead_code"], dic["attr_init"]])
+
     for key, value in dictionary.items():
         total = 0
         flag = False
