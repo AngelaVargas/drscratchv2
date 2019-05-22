@@ -58,3 +58,4 @@ csvs/
 static/img/
 locale/
 .idea
+log/*
