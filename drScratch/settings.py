@@ -12,15 +12,15 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
-BASE_DIR = '/var/www/drScratch/'
+BASE_DIR = '/var/www/drscratchv2/'
 
-STATIC_URL = '/var/www/drScratch/static/'
+STATIC_URL = '/var/www/drscratchv2/static/'
 
 STATICFILES_DIRS = (
-os.path.join(BASE_DIR, '/var/www/drScratch/static'),
+os.path.join(BASE_DIR, '/var/www/drscratchv2/static'),
 )
 
-STATIC_ROOT = '/var/www/drScratch/static/'
+STATIC_ROOT = '/var/www/drscratchv2/static/'
 
 
 # Quick-start development settings - unsuitable for production
@@ -43,7 +43,7 @@ TEMPLATE_LOADERS = (
 )
 
 
-TEMPLATE_DIRS = ('/var/www/drScratch/templates',)
+TEMPLATE_DIRS = ('/var/www/drscratchv2/templates',)
 
 ALLOWED_HOSTS = ['localhost', '100.91.170.113','www.drscratch.org']
 
@@ -82,7 +82,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'drscratch',
-	'USER': 'root',
+	'USER': 'scratcher',
 	'PASSWORD': 'Mysql.drscratch',
 	'HOST': 'localhost',
 	'PORT': '',
