@@ -57,3 +57,4 @@ error_analyzing/
 csvs/
 static/img/
 locale/
+.idea
