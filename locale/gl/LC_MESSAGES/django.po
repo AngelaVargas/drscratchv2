@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-03-17 18:39+0000\n"
+"POT-Creation-Date: 2017-01-31 11:44+0000\n"
 "PO-Revision-Date: 2015-06-29 18:07+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -18,29 +18,33 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 1.8.1\n"
 
-#: drScratch/settings.py:113
-msgid "English"
-msgstr "Inglés"
-
-#: drScratch/settings.py:114
+#: drScratch/settings.py:110
 msgid "Spanish"
 msgstr "Español"
 
-#: drScratch/settings.py:115 templates/main/collaborators.html:273
+#: drScratch/settings.py:111
+msgid "English"
+msgstr "Inglés"
+
+#: drScratch/settings.py:112 templates/main/collaborators.html:273
 msgid "Catalan"
 msgstr ""
 
-#: drScratch/settings.py:116 templates/main/collaborators.html:295
+#: drScratch/settings.py:113 templates/main/collaborators.html:295
 msgid "Galician"
 msgstr ""
 
-#: drScratch/settings.py:117 templates/main/collaborators.html:228
+#: drScratch/settings.py:114 templates/main/collaborators.html:228
 #: templates/main/collaborators.html:319
 msgid "Portuguese"
 msgstr ""
 
-#: drScratch/settings.py:118 templates/main/collaborators.html:250
+#: drScratch/settings.py:115 templates/main/collaborators.html:250
 msgid "Greek"
+msgstr ""
+
+#: drScratch/settings.py:116
+msgid "Basque"
 msgstr ""
 
 #: templates/coder/base.html:74 templates/main/statistics.html:66
