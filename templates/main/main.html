@@ -105,7 +105,7 @@
                           <ul role="menu" class="dropdown-menu">
                             <li>
                             <div style="padding: 15px; padding-bottom: 10px;">
-                            <form action="/i18n/setlang/" method="post" type="hidden">
+                            <form action="/v2/i18n/setlang/" method="post" type="hidden">
                               {% csrf_token %}
                               <input name="next" type="hidden" value="{{ redirect_to }}" />
                               <select name="language" type="hidden">
